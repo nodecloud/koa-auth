@@ -6,7 +6,7 @@
     "type": "git",
     "url": "https://github.com/nodecloud/koa-auth.git"
   },
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
     "test": "mocha --compilers js:babel-core/register",
     "dist": "babel ./index.js -d build/"
