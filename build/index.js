@@ -40,7 +40,8 @@ module.exports = function (options = {}) {
 
             if (apiRegxStr && new RegExp(apiRegxStr).test(ctx.url)) {
                 return invalidCallback(ctx, next);
-            } else if (ctx.accepts('application/json')) {
+            } else if (!ctx.accepts('html')) {
+                console.log('ddd');
                 return invalidCallback(ctx, next);
             }
             ctx.redirect(redirectUrl);
