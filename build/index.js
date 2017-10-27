@@ -4,14 +4,6 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 const AuthError = require('yan-error-class').AuthError;
 
-const defaultOptions = {
-    authorFunc: defaultAuthorization,
-    invalidCallback: defaultInvalidCallback,
-    exceptUrls: ['/login', '/logout'],
-    apiRegxStr: '^\/api\/.+',
-    redirectUrl: '/login'
-};
-
 const defaultAuthorization = function defaultAuthorization(ctx) {
     return ctx && ctx['session'] && typeof ctx['session']['user'] === 'object';
 };
@@ -20,16 +12,22 @@ const defaultInvalidCallback = function defaultInvalidCallback() {
     throw new AuthError('未登录或登录过期，请重新登录');
 };
 
+const defaultOptions = {
+    authorFunc: defaultAuthorization,
+    invalidCallback: defaultInvalidCallback,
+    exceptUrls: ['/login', '/logout'],
+    redirectUrl: '/login'
+};
+
 module.exports = function (options = {}) {
     const authorFunc = getFunction(options.authorFunc) || defaultOptions.authorFunc;
     const invalidCallback = getFunction(options.invalidCallback) || defaultOptions.invalidCallback;
     const exceptUrls = getArray(options.exceptUrls) || defaultOptions.exceptUrls;
-    const apiRegxStr = getString(options.apiRegxStr) || defaultOptions.apiRegxStr;
+    const apiRegxStr = getString(options.apiRegxStr);
     const redirectUrl = getString(options.redirectUrl) || defaultOptions.redirectUrl;
 
     return (() => {
         var _ref = _asyncToGenerator(function* (ctx, next) {
-            const regx = new RegExp(apiRegxStr);
             const isLogin = yield authorFunc(ctx);
 
             if (isLogin) {
@@ -40,10 +38,11 @@ module.exports = function (options = {}) {
                 return next();
             }
 
-            if (regx.test(ctx.url) || ctx.is('application/json')) {
-                yield invalidCallback();
+            if (apiRegxStr && new RegExp(apiRegxStr).test(ctx.url)) {
+                return invalidCallback(ctx, next);
+            } else if (ctx.accepts('application/json')) {
+                return invalidCallback(ctx, next);
             }
-
             ctx.redirect(redirectUrl);
         });
 
