@@ -12,7 +12,7 @@ describe('test/default.test.js', () => {
         it('should return 302 status', async () => {
             return request(server)
                 .get('/')
-                .set('Accept', 'text/html')
+                .set('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8')
                 .expect(302);
         });
         it('should return 200 status', async () => {
@@ -28,6 +28,7 @@ describe('test/default.test.js', () => {
         it('should return 401 status', async () => {
             return request(server)
                 .get('/hello')
+                .set('Accept', 'application/json')
                 .expect(401);
         });
     })

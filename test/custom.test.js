@@ -34,6 +34,7 @@ describe('test/custom.test.js', () => {
         it('should return 401 status', async () => {
             return request(server)
                 .get('/login')
+                .set('Accept', 'application/json')
                 .expect(401)
         });
         it('should return 200 status', async () => {
